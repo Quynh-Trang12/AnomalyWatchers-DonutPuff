@@ -20,6 +20,8 @@ import {
   exportTransactions
 } from "@/lib/storage";
 import { getRiskLevel } from "@/lib/scoring";
+import { getEventTypeLabel } from "@/lib/eventTypes";
+import { GlobalTrafficMonitor } from "@/components/admin/GlobalTrafficMonitor";
 import { 
   Settings, 
   Shield, 
@@ -28,7 +30,8 @@ import {
   Save, 
   Download,
   AlertTriangle,
-  History
+  History,
+  Activity
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -168,7 +171,7 @@ export default function Admin() {
           </header>
 
           <Tabs defaultValue="thresholds" className="space-y-6">
-            <TabsList className="w-full justify-start overflow-x-auto">
+            <TabsList className="w-full justify-start overflow-x-auto flex-wrap h-auto gap-1 p-1">
               <TabsTrigger value="thresholds" className="gap-2">
                 <Settings className="h-4 w-4" aria-hidden="true" />
                 Thresholds
@@ -184,6 +187,10 @@ export default function Admin() {
               <TabsTrigger value="monitoring" className="gap-2">
                 <BarChart3 className="h-4 w-4" aria-hidden="true" />
                 Monitoring
+              </TabsTrigger>
+              <TabsTrigger value="traffic" className="gap-2">
+                <Activity className="h-4 w-4" aria-hidden="true" />
+                Global Traffic
               </TabsTrigger>
             </TabsList>
 
@@ -374,10 +381,10 @@ export default function Admin() {
                       <div key={t.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
                         <div className="min-w-0">
                           <div className="text-sm font-medium truncate">
-                            {t.type} — {t.amount.toLocaleString()}
+                            {getEventTypeLabel(t.type)} — ${t.amount.toLocaleString()}
                           </div>
                           <div className="text-xs text-muted-foreground">
-                            Step {t.step} • {new Date(t.createdAt).toLocaleDateString()}
+                            Hour {t.step} • {new Date(t.createdAt).toLocaleDateString()}
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
@@ -494,6 +501,11 @@ export default function Admin() {
                   </div>
                 )}
               </div>
+            </TabsContent>
+
+            {/* Global Traffic Tab */}
+            <TabsContent value="traffic">
+              <GlobalTrafficMonitor transactions={transactions} />
             </TabsContent>
           </Tabs>
         </div>

@@ -8,6 +8,7 @@ import { OTPChallenge } from "@/components/result/OTPChallenge";
 import { TransactionDatasetView } from "@/components/result/TransactionDatasetView";
 import { Transaction, Decision } from "@/types/transaction";
 import { getPendingTransaction, clearPendingTransaction, updateTransaction } from "@/lib/storage";
+import { getEventTypeLabel, formatCurrency } from "@/lib/eventTypes";
 import { PlayCircle, History, AlertCircle } from "lucide-react";
 
 export default function Result() {
@@ -85,7 +86,7 @@ export default function Result() {
               tabIndex={-1}
               className="text-2xl sm:text-3xl font-bold mb-4 outline-none"
             >
-              Transaction Result
+              Risk Assessment Result
             </h1>
             <DecisionBadge decision={displayDecision} size="lg" />
           </div>
@@ -123,23 +124,23 @@ export default function Result() {
               <h2 className="font-semibold mb-4">Transaction Summary</h2>
               <dl className="grid grid-cols-2 gap-3 text-sm">
                 <div>
-                  <dt className="text-muted-foreground">Type</dt>
-                  <dd className="font-medium">{transaction.type}</dd>
+                  <dt className="text-muted-foreground">Event Type</dt>
+                  <dd className="font-medium">{getEventTypeLabel(transaction.type)}</dd>
                 </div>
                 <div>
                   <dt className="text-muted-foreground">Amount</dt>
-                  <dd className="font-mono font-medium">{transaction.amount.toLocaleString()}</dd>
+                  <dd className="font-mono font-medium">{formatCurrency(transaction.amount)}</dd>
                 </div>
                 <div>
-                  <dt className="text-muted-foreground">Origin</dt>
+                  <dt className="text-muted-foreground">Sender</dt>
                   <dd className="font-mono text-xs">{transaction.nameOrig}</dd>
                 </div>
                 <div>
-                  <dt className="text-muted-foreground">Destination</dt>
+                  <dt className="text-muted-foreground">Recipient</dt>
                   <dd className="font-mono text-xs">{transaction.nameDest}</dd>
                 </div>
                 <div>
-                  <dt className="text-muted-foreground">Flagged (Legacy)</dt>
+                  <dt className="text-muted-foreground">Legacy Flagged</dt>
                   <dd>{transaction.isFlaggedFraud === 1 ? "Yes" : "No"}</dd>
                 </div>
                 <div>
@@ -150,8 +151,8 @@ export default function Result() {
             </div>
           )}
 
-          {/* Dataset View */}
-          {!showOTP && <TransactionDatasetView transaction={transaction} />}
+          {/* Dataset View - Collapsed by default */}
+          {!showOTP && <TransactionDatasetView transaction={transaction} defaultOpen={false} />}
 
           {/* Actions */}
           {!showOTP && (
@@ -159,13 +160,13 @@ export default function Result() {
               <Button asChild className="flex-1 gap-2">
                 <Link to="/simulate">
                   <PlayCircle className="h-4 w-4" aria-hidden="true" />
-                  Simulate Another
+                  Run Another Simulation
                 </Link>
               </Button>
               <Button asChild variant="outline" className="flex-1 gap-2">
                 <Link to="/history">
                   <History className="h-4 w-4" aria-hidden="true" />
-                  View History
+                  View Activity Log
                 </Link>
               </Button>
             </div>

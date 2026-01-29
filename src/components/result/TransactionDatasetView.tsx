@@ -37,8 +37,8 @@ export function TransactionDatasetView({ transaction, defaultOpen = false }: Tra
       >
         <div className="flex items-center gap-2">
           <Database className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
-          <span className="font-medium">Dataset View</span>
-          <span className="text-xs text-muted-foreground">(Kaggle column names)</span>
+          <span className="font-medium">Inspect Technical Details</span>
+          <span className="text-xs text-muted-foreground">(Raw Dataset Fields)</span>
         </div>
         {isOpen ? (
           <ChevronUp className="h-4 w-4 text-muted-foreground" />

@@ -7,7 +7,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { PresetButtons } from "./PresetButtons";
 import { BalanceDisplay } from "./BalanceDisplay";
+import { TimeStepBadge } from "@/components/ui/TimeStepBadge";
 import { TransactionPreset } from "@/lib/presets";
+import { EVENT_TYPE_LABELS, formatCurrency } from "@/lib/eventTypes";
 import { 
   TransactionType, 
   Transaction, 
@@ -26,7 +28,7 @@ import {
   setPendingTransaction,
 } from "@/lib/storage";
 import { computeIsFlaggedFraud, scoreTransaction } from "@/lib/scoring";
-import { RotateCcw, Send, ChevronDown, ChevronUp } from "lucide-react";
+import { RotateCcw, Send, ChevronDown, ChevronUp, DollarSign } from "lucide-react";
 
 interface FormErrors {
   [key: string]: string;
@@ -104,16 +106,16 @@ export function TransactionForm() {
     const newErrors: FormErrors = {};
 
     if (step < 1) {
-      newErrors.step = "Step must be at least 1";
+      newErrors.step = "Time step must be at least 1";
     }
     if (!type) {
-      newErrors.type = "Please select a transaction type";
+      newErrors.type = "Please select an event type";
     }
     if (!nameOrig) {
-      newErrors.nameOrig = "Please select an origin account";
+      newErrors.nameOrig = "Please select a sender account";
     }
     if (!amount || amountNum <= 0) {
-      newErrors.amount = "Amount must be greater than 0";
+      newErrors.amount = "Amount must be greater than $0";
     }
     if (
       !allowNegativeBalance && 
@@ -121,7 +123,7 @@ export function TransactionForm() {
       type !== "CASH_IN" && 
       amountNum > oldbalanceOrg
     ) {
-      newErrors.amount = `Insufficient balance. Available: ${oldbalanceOrg.toLocaleString()}`;
+      newErrors.amount = `Insufficient balance. Available: ${formatCurrency(oldbalanceOrg)}`;
     }
 
     setErrors(newErrors);
@@ -249,40 +251,42 @@ export function TransactionForm() {
         <div className="lg:col-span-2 space-y-6">
           {/* Time & Type */}
           <fieldset className="form-fieldset">
-            <legend className="form-legend">Time & Type</legend>
+            <legend className="form-legend">Time & Event</legend>
             
             <div className="grid sm:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="step">Step (time unit)</Label>
+                <Label htmlFor="step">Time Step (Hour)</Label>
                 <Input
                   id="step"
                   type="number"
                   min={1}
                   value={step}
                   onChange={e => setStep(parseInt(e.target.value) || 1)}
-                  aria-describedby={errors.step ? "step-error" : undefined}
+                  aria-describedby={errors.step ? "step-error" : "step-hint"}
                   aria-invalid={!!errors.step}
                 />
-                {errors.step && (
+                {errors.step ? (
                   <p id="step-error" className="text-sm text-danger">{errors.step}</p>
+                ) : (
+                  <TimeStepBadge step={step} className="mt-1" />
                 )}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="type">Transaction Type</Label>
+                <Label htmlFor="type">Event Type</Label>
                 <Select value={type} onValueChange={(v) => setType(v as TransactionType)}>
                   <SelectTrigger 
                     id="type"
                     aria-describedby={errors.type ? "type-error" : undefined}
                     aria-invalid={!!errors.type}
                   >
-                    <SelectValue placeholder="Select type..." />
+                    <SelectValue placeholder="Select event type..." />
                   </SelectTrigger>
                   <SelectContent>
                     {TRANSACTION_TYPES.map(t => (
                       <SelectItem key={t.value} value={t.value}>
-                        <span className="font-medium">{t.value}</span>
-                        <span className="text-muted-foreground ml-2">— {t.description}</span>
+                        <span className="font-medium">{EVENT_TYPE_LABELS[t.value]}</span>
+                        <span className="text-muted-foreground ml-2 text-xs">({t.value})</span>
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -300,21 +304,21 @@ export function TransactionForm() {
             
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="nameOrig">Origin Account (nameOrig)</Label>
+                <Label htmlFor="nameOrig">Sender Account</Label>
                 <Select value={nameOrig} onValueChange={setNameOrig}>
                   <SelectTrigger 
                     id="nameOrig"
                     aria-describedby={errors.nameOrig ? "nameOrig-error" : undefined}
                     aria-invalid={!!errors.nameOrig}
                   >
-                    <SelectValue placeholder="Select origin account..." />
+                    <SelectValue placeholder="Select sender account..." />
                   </SelectTrigger>
                   <SelectContent>
                     {originAccounts.map(account => (
                       <SelectItem key={account.id} value={account.id}>
                         <span className="font-mono">{account.name}</span>
                         <span className="text-muted-foreground ml-2">
-                          — Balance: {account.balance.toLocaleString()}
+                          (Avail: {formatCurrency(account.balance)})
                         </span>
                       </SelectItem>
                     ))}
@@ -325,19 +329,19 @@ export function TransactionForm() {
                 )}
                 {selectedOrigin && (
                   <p className="text-sm text-muted-foreground">
-                    Origin balance before: <span className="font-mono">{oldbalanceOrg.toLocaleString()}</span>
+                    Current balance: <span className="font-mono font-medium">{formatCurrency(oldbalanceOrg)}</span>
                   </p>
                 )}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="nameDest">Destination (nameDest)</Label>
+                <Label htmlFor="nameDest">Recipient / Merchant</Label>
                 {advancedMode ? (
                   <Input
                     id="nameDest"
                     value={nameDest}
                     onChange={e => setNameDest(e.target.value)}
-                    placeholder={computedNameDest || "Enter destination..."}
+                    placeholder={computedNameDest || "Enter recipient..."}
                   />
                 ) : (
                   <Input
@@ -349,7 +353,7 @@ export function TransactionForm() {
                   />
                 )}
                 <p id="nameDest-hint" className="text-xs text-muted-foreground">
-                  {advancedMode ? "Enter custom destination" : "Auto-generated based on transaction type"}
+                  {advancedMode ? "Enter custom recipient" : "Auto-generated based on event type"}
                 </p>
               </div>
             </div>
@@ -357,26 +361,30 @@ export function TransactionForm() {
 
           {/* Amount */}
           <fieldset className="form-fieldset">
-            <legend className="form-legend">Amount</legend>
+            <legend className="form-legend">Transaction Amount</legend>
             
             <div className="space-y-2">
-              <Label htmlFor="amount">Amount (dataset units)</Label>
-              <Input
-                id="amount"
-                type="number"
-                min={0}
-                step="0.01"
-                value={amount}
-                onChange={e => setAmount(e.target.value)}
-                placeholder="0.00"
-                aria-describedby={errors.amount ? "amount-error" : "amount-hint"}
-                aria-invalid={!!errors.amount}
-              />
+              <Label htmlFor="amount">Amount</Label>
+              <div className="relative">
+                <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="amount"
+                  type="number"
+                  min={0}
+                  step="0.01"
+                  value={amount}
+                  onChange={e => setAmount(e.target.value)}
+                  placeholder="0.00"
+                  className="pl-9"
+                  aria-describedby={errors.amount ? "amount-error" : "amount-hint"}
+                  aria-invalid={!!errors.amount}
+                />
+              </div>
               {errors.amount ? (
                 <p id="amount-error" className="text-sm text-danger">{errors.amount}</p>
               ) : (
                 <p id="amount-hint" className="text-xs text-muted-foreground">
-                  Enter the transaction amount in dataset units
+                  Enter the transaction amount in USD (simulated)
                 </p>
               )}
             </div>
@@ -385,16 +393,16 @@ export function TransactionForm() {
           {/* Derived Balances */}
           {(nameOrig && amountNum > 0) && (
             <fieldset className="form-fieldset">
-              <legend className="form-legend">Computed Balances</legend>
+              <legend className="form-legend">Balance Changes</legend>
               <div className="space-y-2">
                 <BalanceDisplay
-                  label="Origin"
+                  label="Sender"
                   oldBalance={oldbalanceOrg}
                   newBalance={newbalanceOrig}
                   highlight={newbalanceOrig < oldbalanceOrg ? "decrease" : newbalanceOrig > oldbalanceOrg ? "increase" : "none"}
                 />
                 <BalanceDisplay
-                  label="Destination"
+                  label="Recipient"
                   oldBalance={oldbalanceDest}
                   newBalance={newbalanceDest}
                   highlight={newbalanceDest > oldbalanceDest ? "increase" : "none"}
@@ -423,22 +431,26 @@ export function TransactionForm() {
             {advancedMode && (
               <div id="advanced-options" className="mt-4 space-y-4 pt-4 border-t border-border">
                 <div className="space-y-2">
-                  <Label htmlFor="manualOldBalanceDest">Override oldbalanceDest</Label>
-                  <Input
-                    id="manualOldBalanceDest"
-                    type="number"
-                    min={0}
-                    value={manualOldBalanceDest}
-                    onChange={e => setManualOldBalanceDest(e.target.value)}
-                    placeholder={oldbalanceDest.toString()}
-                  />
+                  <Label htmlFor="manualOldBalanceDest">Override Recipient Starting Balance</Label>
+                  <div className="relative">
+                    <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="manualOldBalanceDest"
+                      type="number"
+                      min={0}
+                      value={manualOldBalanceDest}
+                      onChange={e => setManualOldBalanceDest(e.target.value)}
+                      placeholder={oldbalanceDest.toString()}
+                      className="pl-9"
+                    />
+                  </div>
                 </div>
 
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
                     <Label htmlFor="allowNegative">Allow insufficient balance</Label>
                     <p className="text-xs text-muted-foreground">
-                      Bypass balance check for testing
+                      Bypass balance check for testing edge cases
                     </p>
                   </div>
                   <Switch

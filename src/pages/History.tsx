@@ -1,15 +1,16 @@
 import { useState, useMemo, useRef, useEffect } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DecisionBadge } from "@/components/ui/DecisionBadge";
 import { RiskScore } from "@/components/ui/RiskScore";
 import { TransactionDatasetView } from "@/components/result/TransactionDatasetView";
+import { TransactionListItem } from "@/components/history/TransactionListItem";
 import { Transaction, TransactionType, Decision, TRANSACTION_TYPES } from "@/types/transaction";
 import { getTransactions } from "@/lib/storage";
-import { Search, Filter, X, ChevronDown, ChevronUp, AlertCircle } from "lucide-react";
+import { getEventTypeLabel, formatCurrency, EVENT_TYPE_LABELS } from "@/lib/eventTypes";
+import { Filter, X, AlertCircle, User } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 export default function History() {
@@ -51,15 +52,19 @@ export default function History() {
       <div className="container py-6 sm:py-8">
         <div className="max-w-5xl mx-auto">
           <header className="mb-6">
-            <h1 
-              ref={headingRef}
-              tabIndex={-1}
-              className="text-2xl sm:text-3xl font-bold mb-2 outline-none"
-            >
-              Transaction History
-            </h1>
+            <div className="flex items-center gap-2 mb-2">
+              <User className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+              <h1 
+                ref={headingRef}
+                tabIndex={-1}
+                className="text-2xl sm:text-3xl font-bold outline-none"
+              >
+                My Simulation Activity
+              </h1>
+            </div>
             <p className="text-muted-foreground">
-              {transactions.length} transaction{transactions.length !== 1 ? "s" : ""} recorded
+              A log of the fraud scenarios you have tested in this session.
+              {transactions.length > 0 && ` ${transactions.length} simulation${transactions.length !== 1 ? "s" : ""} recorded.`}
             </p>
           </header>
 
@@ -78,7 +83,7 @@ export default function History() {
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="type-filter">Type</Label>
+                <Label htmlFor="type-filter">Event Type</Label>
                 <Select value={typeFilter} onValueChange={(v) => setTypeFilter(v as TransactionType | "ALL")}>
                   <SelectTrigger id="type-filter">
                     <SelectValue />
@@ -86,7 +91,7 @@ export default function History() {
                   <SelectContent>
                     <SelectItem value="ALL">All Types</SelectItem>
                     {TRANSACTION_TYPES.map(t => (
-                      <SelectItem key={t.value} value={t.value}>{t.value}</SelectItem>
+                      <SelectItem key={t.value} value={t.value}>{EVENT_TYPE_LABELS[t.value]}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -117,7 +122,7 @@ export default function History() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="ALL">All</SelectItem>
-                    <SelectItem value="YES">Flagged (isFlaggedFraud=1)</SelectItem>
+                    <SelectItem value="YES">Flagged</SelectItem>
                     <SelectItem value="NO">Not Flagged</SelectItem>
                   </SelectContent>
                 </Select>
@@ -143,49 +148,18 @@ export default function History() {
             <div className="section-card text-center py-12">
               <p className="text-muted-foreground">
                 {transactions.length === 0
-                  ? "No transactions yet. Start by creating a simulation."
-                  : "No transactions match the selected filters."}
+                  ? "No simulations yet. Start by creating a simulation."
+                  : "No simulations match the selected filters."}
               </p>
             </div>
           ) : (
             <div className="space-y-3">
               {filteredTransactions.map(transaction => (
-                <button
+                <TransactionListItem
                   key={transaction.id}
+                  transaction={transaction}
                   onClick={() => setSelectedTransaction(transaction)}
-                  className="w-full text-left section-card hover:shadow-md transition-shadow focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                  aria-label={`View details for ${transaction.type} transaction of ${transaction.amount.toLocaleString()}`}
-                >
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="font-semibold">{transaction.type}</span>
-                        <span className="text-muted-foreground">•</span>
-                        <span className="font-mono text-sm">{transaction.amount.toLocaleString()}</span>
-                        {transaction.isFlaggedFraud === 1 && (
-                          <span className="text-xs bg-warning-muted text-warning px-2 py-0.5 rounded">
-                            Flagged
-                          </span>
-                        )}
-                      </div>
-                      <div className="text-sm text-muted-foreground truncate">
-                        <span className="font-mono">{transaction.nameOrig}</span>
-                        <span className="mx-2">→</span>
-                        <span className="font-mono">{transaction.nameDest}</span>
-                      </div>
-                      <div className="text-xs text-muted-foreground mt-1">
-                        Step {transaction.step} • {new Date(transaction.createdAt).toLocaleString()}
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-4">
-                      <div className="w-24">
-                        <RiskScore score={transaction.riskScore} showBar={false} size="sm" />
-                      </div>
-                      <DecisionBadge decision={transaction.decision} size="sm" />
-                    </div>
-                  </div>
-                </button>
+                />
               ))}
             </div>
           )}
@@ -196,7 +170,7 @@ export default function History() {
       <Dialog open={!!selectedTransaction} onOpenChange={() => setSelectedTransaction(null)}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Transaction Details</DialogTitle>
+            <DialogTitle>Simulation Details</DialogTitle>
           </DialogHeader>
           
           {selectedTransaction && (
@@ -210,23 +184,23 @@ export default function History() {
                 <h3 className="font-semibold mb-3">Summary</h3>
                 <dl className="grid grid-cols-2 gap-3 text-sm">
                   <div>
-                    <dt className="text-muted-foreground">Type</dt>
-                    <dd className="font-medium">{selectedTransaction.type}</dd>
+                    <dt className="text-muted-foreground">Event Type</dt>
+                    <dd className="font-medium">{getEventTypeLabel(selectedTransaction.type)}</dd>
                   </div>
                   <div>
                     <dt className="text-muted-foreground">Amount</dt>
-                    <dd className="font-mono font-medium">{selectedTransaction.amount.toLocaleString()}</dd>
+                    <dd className="font-mono font-medium">{formatCurrency(selectedTransaction.amount)}</dd>
                   </div>
                   <div>
-                    <dt className="text-muted-foreground">Origin</dt>
+                    <dt className="text-muted-foreground">Sender</dt>
                     <dd className="font-mono text-xs">{selectedTransaction.nameOrig}</dd>
                   </div>
                   <div>
-                    <dt className="text-muted-foreground">Destination</dt>
+                    <dt className="text-muted-foreground">Recipient</dt>
                     <dd className="font-mono text-xs">{selectedTransaction.nameDest}</dd>
                   </div>
                   <div>
-                    <dt className="text-muted-foreground">Flagged (Legacy)</dt>
+                    <dt className="text-muted-foreground">Legacy Flagged</dt>
                     <dd>{selectedTransaction.isFlaggedFraud === 1 ? "Yes" : "No"}</dd>
                   </div>
                   <div>
@@ -248,7 +222,7 @@ export default function History() {
                 </ul>
               </div>
 
-              <TransactionDatasetView transaction={selectedTransaction} defaultOpen />
+              <TransactionDatasetView transaction={selectedTransaction} defaultOpen={false} />
             </div>
           )}
         </DialogContent>

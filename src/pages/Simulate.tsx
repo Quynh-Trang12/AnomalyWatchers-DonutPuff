@@ -8,11 +8,11 @@ export default function Simulate() {
         <div className="max-w-5xl mx-auto">
           <header className="mb-6 sm:mb-8">
             <h1 className="text-2xl sm:text-3xl font-bold mb-2">
-              Transaction Simulator
+              Risk Analysis Workbench
             </h1>
             <p className="text-muted-foreground">
-              Create a synthetic transaction using the Kaggle dataset field names. 
-              The mock model will compute a risk score and decision.
+              Simulate a financial transaction to test the Fraud Detection Engine. 
+              Configure the sender, recipient, and time context to observe how the AI assesses risk.
             </p>
           </header>
 
