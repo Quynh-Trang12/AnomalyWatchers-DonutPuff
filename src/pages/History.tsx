@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DecisionBadge } from "@/components/ui/DecisionBadge";
 import { RiskScore } from "@/components/ui/RiskScore";
+import { GroundTruthBadge } from "@/components/ui/GroundTruthBadge";
 import { TransactionDatasetView } from "@/components/result/TransactionDatasetView";
 import { TransactionListItem } from "@/components/history/TransactionListItem";
 import { Transaction, TransactionType, Decision, TRANSACTION_TYPES } from "@/types/transaction";
@@ -200,12 +201,8 @@ export default function History() {
                     <dd className="font-mono text-xs">{selectedTransaction.nameDest}</dd>
                   </div>
                   <div>
-                    <dt className="text-muted-foreground">Legacy Flagged</dt>
-                    <dd>{selectedTransaction.isFlaggedFraud === 1 ? "Yes" : "No"}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-muted-foreground">Labeled as Fraud</dt>
-                    <dd>{selectedTransaction.isFraud === 1 ? "Yes" : "No"}</dd>
+                    <dt className="text-muted-foreground">Ground Truth</dt>
+                    <dd><GroundTruthBadge isFraud={selectedTransaction.isFraud} size="sm" /></dd>
                   </div>
                 </dl>
               </div>

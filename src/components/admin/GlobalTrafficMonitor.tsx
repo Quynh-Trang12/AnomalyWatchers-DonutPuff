@@ -1,11 +1,11 @@
 import { useState, useMemo } from "react";
 import { Transaction, TransactionType, Decision, TRANSACTION_TYPES } from "@/types/transaction";
-import { getTransactions } from "@/lib/storage";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DecisionBadge } from "@/components/ui/DecisionBadge";
 import { RiskScore } from "@/components/ui/RiskScore";
+import { GroundTruthBadge } from "@/components/ui/GroundTruthBadge";
 import { TransactionDatasetView } from "@/components/result/TransactionDatasetView";
 import { getEventTypeLabel, formatCurrency, EVENT_TYPE_LABELS } from "@/lib/eventTypes";
 import { Filter, X, AlertCircle, Shield } from "lucide-react";
@@ -131,6 +131,7 @@ export function GlobalTrafficMonitor({ transactions }: GlobalTrafficMonitorProps
                   <th className="text-left py-3 px-4 font-medium text-muted-foreground">Sender → Recipient</th>
                   <th className="text-left py-3 px-4 font-medium text-muted-foreground">Risk</th>
                   <th className="text-left py-3 px-4 font-medium text-muted-foreground">Decision</th>
+                  <th className="text-left py-3 px-4 font-medium text-muted-foreground">Ground Truth</th>
                 </tr>
               </thead>
               <tbody>
@@ -157,6 +158,9 @@ export function GlobalTrafficMonitor({ transactions }: GlobalTrafficMonitorProps
                     </td>
                     <td className="py-3 px-4">
                       <DecisionBadge decision={t.decision} size="sm" />
+                    </td>
+                    <td className="py-3 px-4">
+                      <GroundTruthBadge isFraud={t.isFraud} size="sm" />
                     </td>
                   </tr>
                 ))}
@@ -209,12 +213,8 @@ export function GlobalTrafficMonitor({ transactions }: GlobalTrafficMonitorProps
                     <dd className="font-mono text-xs">{selectedTransaction.nameDest}</dd>
                   </div>
                   <div>
-                    <dt className="text-muted-foreground">Legacy Flagged</dt>
-                    <dd>{selectedTransaction.isFlaggedFraud === 1 ? "Yes" : "No"}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-muted-foreground">Labeled as Fraud</dt>
-                    <dd>{selectedTransaction.isFraud === 1 ? "Yes" : "No"}</dd>
+                    <dt className="text-muted-foreground">Ground Truth Status</dt>
+                    <dd><GroundTruthBadge isFraud={selectedTransaction.isFraud} size="sm" /></dd>
                   </div>
                 </dl>
               </div>

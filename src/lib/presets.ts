@@ -57,4 +57,14 @@ export const TRANSACTION_PRESETS: TransactionPreset[] = [
     amount: 500,
     originAccountIndex: 0, // Account with 50000 balance
   },
+  {
+    id: "known_fraud_pattern",
+    name: "Known Fraud Pattern (high risk)",
+    description: "Suspicious 3 AM transfer with balance drain - should be blocked",
+    expectedOutcome: "BLOCK",
+    type: "TRANSFER",
+    amount: 99000,
+    originAccountIndex: 0, // Account with 50000 balance (will trigger multiple risk factors)
+    customNameDest: "C9999999999", // New suspicious destination
+  },
 ];

@@ -16,22 +16,20 @@ import {
   addAuditLogEntry,
   getAdminAuditLog,
   getTransactions,
-  updateTransaction,
   exportTransactions
 } from "@/lib/storage";
-import { getRiskLevel } from "@/lib/scoring";
-import { getEventTypeLabel } from "@/lib/eventTypes";
 import { GlobalTrafficMonitor } from "@/components/admin/GlobalTrafficMonitor";
+import { ReviewQueue } from "@/components/admin/ReviewQueue";
 import { 
   Settings, 
   Shield, 
-  Tag, 
+  ClipboardCheck, 
   BarChart3, 
   Save, 
   Download,
   AlertTriangle,
-  History,
-  Activity
+  Activity,
+  History
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -98,12 +96,8 @@ export default function Admin() {
     });
   };
 
-  const handleLabelFraud = (id: string, isFraud: 0 | 1) => {
-    updateTransaction(id, { isFraud });
+  const refreshTransactions = () => {
     setTransactions(getTransactions());
-    toast({
-      title: `Transaction ${isFraud === 1 ? "labeled as fraud" : "unlabeled"}`,
-    });
   };
 
   const handleExport = (format: "json" | "csv") => {
@@ -180,9 +174,9 @@ export default function Admin() {
                 <Shield className="h-4 w-4" aria-hidden="true" />
                 Rules
               </TabsTrigger>
-              <TabsTrigger value="labeling" className="gap-2">
-                <Tag className="h-4 w-4" aria-hidden="true" />
-                Labeling
+              <TabsTrigger value="review" className="gap-2">
+                <ClipboardCheck className="h-4 w-4" aria-hidden="true" />
+                Review Queue
               </TabsTrigger>
               <TabsTrigger value="monitoring" className="gap-2">
                 <BarChart3 className="h-4 w-4" aria-hidden="true" />
@@ -351,64 +345,19 @@ export default function Admin() {
               </div>
             </TabsContent>
 
-            {/* Labeling Tab */}
-            <TabsContent value="labeling" className="space-y-6">
-              <div className="section-card space-y-4">
-                <div className="flex items-center justify-between">
-                  <h2 className="font-semibold">Label Transactions</h2>
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm" onClick={() => handleExport("json")} className="gap-1">
-                      <Download className="h-3 w-3" aria-hidden="true" />
-                      JSON
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={() => handleExport("csv")} className="gap-1">
-                      <Download className="h-3 w-3" aria-hidden="true" />
-                      CSV
-                    </Button>
-                  </div>
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  Set the isFraud label for each transaction (for demo ground truth).
-                </p>
-
-                {transactions.length === 0 ? (
-                  <p className="text-muted-foreground text-center py-8">
-                    No transactions to label.
-                  </p>
-                ) : (
-                  <div className="space-y-2 max-h-96 overflow-y-auto">
-                    {transactions.slice(0, 50).map(t => (
-                      <div key={t.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
-                        <div className="min-w-0">
-                          <div className="text-sm font-medium truncate">
-                            {getEventTypeLabel(t.type)} — ${t.amount.toLocaleString()}
-                          </div>
-                          <div className="text-xs text-muted-foreground">
-                            Hour {t.step} • {new Date(t.createdAt).toLocaleDateString()}
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs text-muted-foreground">isFraud:</span>
-                          <Button
-                            variant={t.isFraud === 0 ? "default" : "outline"}
-                            size="sm"
-                            onClick={() => handleLabelFraud(t.id, 0)}
-                          >
-                            0
-                          </Button>
-                          <Button
-                            variant={t.isFraud === 1 ? "destructive" : "outline"}
-                            size="sm"
-                            onClick={() => handleLabelFraud(t.id, 1)}
-                          >
-                            1
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+            {/* Review Queue Tab */}
+            <TabsContent value="review" className="space-y-6">
+              <div className="flex items-center justify-end gap-2">
+                <Button variant="outline" size="sm" onClick={() => handleExport("json")} className="gap-1">
+                  <Download className="h-3 w-3" aria-hidden="true" />
+                  Export JSON
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => handleExport("csv")} className="gap-1">
+                  <Download className="h-3 w-3" aria-hidden="true" />
+                  Export CSV
+                </Button>
               </div>
+              <ReviewQueue transactions={transactions} onUpdate={refreshTransactions} />
             </TabsContent>
 
             {/* Monitoring Tab */}
