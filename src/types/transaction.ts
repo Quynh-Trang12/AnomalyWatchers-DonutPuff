@@ -1,4 +1,4 @@
-export type TransactionType = "PAYMENT" | "TRANSFER" | "CASH_OUT" | "CASH_IN" | "DEBIT";
+export type TransactionType = "PAYMENT" | "TRANSFER" | "CASH OUT" | "CASH IN" | "DEBIT";
 
 export type Decision = "APPROVE" | "STEP_UP" | "BLOCK" | "APPROVE_AFTER_STEPUP" | "BLOCK_STEPUP_FAILED";
 
@@ -63,8 +63,8 @@ export const DEFAULT_ADMIN_SETTINGS: AdminSettings = {
 export const TRANSACTION_TYPES: { value: TransactionType; label: string; description: string }[] = [
   { value: "PAYMENT", label: "Payment", description: "Payment to merchant" },
   { value: "TRANSFER", label: "Transfer", description: "Transfer to another customer" },
-  { value: "CASH_OUT", label: "Cash Out", description: "Withdraw cash via agent" },
-  { value: "CASH_IN", label: "Cash In", description: "Deposit cash via agent" },
+  { value: "CASH OUT", label: "Cash Out", description: "Withdraw cash via agent" },
+  { value: "CASH IN", label: "Cash In", description: "Deposit cash via agent" },
   { value: "DEBIT", label: "Debit", description: "Bank fee or debit" },
 ];
 

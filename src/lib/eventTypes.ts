@@ -2,8 +2,8 @@ import { TransactionType } from "@/types/transaction";
 
 // Maps internal Kaggle values to user-friendly "Event" labels for the Analyst Workbench
 export const EVENT_TYPE_LABELS: Record<TransactionType, string> = {
-  CASH_IN: "ATM Deposit",
-  CASH_OUT: "ATM Withdrawal",
+  "CASH IN": "ATM Deposit",
+  "CASH OUT": "ATM Withdrawal",
   PAYMENT: "Merchant Purchase",
   DEBIT: "Direct Debit / Auto-Pay",
   TRANSFER: "P2P / Wire Transfer",

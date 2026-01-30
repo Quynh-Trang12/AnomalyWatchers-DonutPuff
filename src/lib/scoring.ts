@@ -57,8 +57,8 @@ export function scoreTransaction(
     reasons.push("Origin balance is zero but amount is non-zero");
   }
 
-  // High-risk amount for TRANSFER or CASH_OUT
-  if ((type === "TRANSFER" || type === "CASH_OUT") && amount > settings.highRiskAmount) {
+  // High-risk amount for TRANSFER or CASH OUT
+  if ((type === "TRANSFER" || type === "CASH OUT") && amount > settings.highRiskAmount) {
     score += 0.15;
     reasons.push("High-risk transaction type with large amount");
   }
@@ -78,9 +78,9 @@ export function scoreTransaction(
   // Type baselines
   const typeBaselines: Record<TransactionType, number> = {
     TRANSFER: 0.05,
-    CASH_OUT: 0.08,
+    "CASH OUT": 0.08,
     PAYMENT: 0.02,
-    CASH_IN: 0.03,
+    "CASH IN": 0.03,
     DEBIT: 0.01,
   };
   score += typeBaselines[type];

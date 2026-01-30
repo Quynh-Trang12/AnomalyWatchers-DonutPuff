@@ -65,11 +65,11 @@ export function TransactionForm() {
     if (!type) return "";
     
     switch (type) {
-      case "CASH_OUT":
-      case "CASH_IN":
-        return "CASH_AGENT";
+      case "CASH OUT":
+      case "CASH IN":
+        return "CASH AGENT";
       case "DEBIT":
-        return "BANK_FEE_ACCOUNT";
+        return "BANK FEE ACCOUNT";
       case "PAYMENT":
         return `M${Math.random().toString().slice(2, 12)}`;
       case "TRANSFER":
@@ -87,15 +87,15 @@ export function TransactionForm() {
     : destBalances[computedNameDest] ?? 0;
 
   const newbalanceOrig = useMemo(() => {
-    if (type === "CASH_IN") {
+    if (type === "CASH IN") {
       return oldbalanceOrg + amountNum;
     }
     return Math.max(oldbalanceOrg - amountNum, 0);
   }, [type, oldbalanceOrg, amountNum]);
 
   const newbalanceDest = useMemo(() => {
-    // For simplicity, CASH_OUT doesn't reduce agent balance
-    if (type === "CASH_OUT") {
+    // For simplicity, CASH OUT doesn't reduce agent balance
+    if (type === "CASH OUT") {
       return oldbalanceDest;
     }
     return oldbalanceDest + amountNum;
@@ -120,7 +120,7 @@ export function TransactionForm() {
     if (
       !allowNegativeBalance && 
       adminSettings.blockInsufficientBalance &&
-      type !== "CASH_IN" && 
+      type !== "CASH IN" && 
       amountNum > oldbalanceOrg
     ) {
       newErrors.amount = `Insufficient balance. Available: ${formatCurrency(oldbalanceOrg)}`;

@@ -280,7 +280,7 @@ export default function Admin() {
                       onChange={e => setSettings({ ...settings, highRiskAmount: parseFloat(e.target.value) || 0 })}
                     />
                     <p className="text-xs text-muted-foreground">
-                      TRANSFER/CASH_OUT ≥ this adds +0.15 risk (default: 150,000)
+                      TRANSFER/CASHOUT ≥ this adds +0.15 risk (default: 150,000)
                     </p>
                   </div>
 

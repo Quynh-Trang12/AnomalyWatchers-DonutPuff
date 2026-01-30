@@ -32,19 +32,19 @@ export const TRANSACTION_PRESETS: TransactionPreset[] = [
   },
   {
     id: "suspicious_cashout",
-    name: "CASH_OUT near empty balance (block)",
+    name: "CASH OUT near empty balance (block)",
     description: "Cash out from near-zero balance - should be blocked",
     expectedOutcome: "BLOCK",
-    type: "CASH_OUT",
+    type: "CASH OUT",
     amount: 200000,
     originAccountIndex: 3, // Account with 25000 balance
   },
   {
     id: "large_cashin",
-    name: "CASH_IN unusually large (step-up)",
+    name: "CASH IN unusually large (step-up)",
     description: "Large cash deposit - may require verification",
     expectedOutcome: "STEP_UP",
-    type: "CASH_IN",
+    type: "CASH IN",
     amount: 180000,
     originAccountIndex: 4, // Account with 0 balance
   },
