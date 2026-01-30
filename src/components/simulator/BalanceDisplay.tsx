@@ -19,7 +19,7 @@ export function BalanceDisplay({ label, oldBalance, newBalance, highlight = "non
   };
 
   return (
-    <div className="flex items-center justify-between gap-2 py-2 px-3 bg-muted/50 rounded-md">
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 py-2 px-3 bg-muted/50 rounded-md">
       <span className="text-sm font-medium text-muted-foreground">{label}</span>
       <div className="flex items-center gap-2 text-sm font-mono">
         <span className="text-muted-foreground">{formatAmount(oldBalance)}</span>
