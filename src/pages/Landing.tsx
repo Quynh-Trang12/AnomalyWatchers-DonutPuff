@@ -69,53 +69,61 @@ export default function Landing() {
           <div className="absolute -bottom-40 -left-40 w-80 h-80 rounded-full bg-primary/5 blur-3xl" />
         </div>
 
+        {/* Shield Watermark - Mobile Background / Desktop Side Element */}
+        <div className="absolute top-10 -right-12 w-3/4 opacity-10 z-0 pointer-events-none md:hidden" aria-hidden="true">
+          <Shield className="w-full h-auto text-primary" />
+        </div>
+
         <div className="container relative">
-          <div className="max-w-4xl mx-auto text-center">
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-8">
-              <Radar className="h-4 w-4" aria-hidden="true" />
-              Transaction Risk Workbench
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between md:gap-12 max-w-6xl mx-auto">
+            {/* Text Content - On top of watermark */}
+            <div className="relative z-10 text-left md:flex-1 md:max-w-2xl">
+              {/* Badge */}
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
+                <Radar className="h-4 w-4" aria-hidden="true" />
+                Transaction Risk Workbench
+              </div>
+              
+              {/* Headline */}
+              <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
+                Next-Gen Transaction
+                <span className="block text-primary">Fraud Detection</span>
+              </h1>
+
+              {/* Slogan */}
+              <p className="text-xl font-medium italic text-primary mt-4">
+                See the invisible. Block the impossible.
+              </p>
+              
+              {/* Subheadline */}
+              <p className="text-lg text-muted-foreground mt-4 leading-relaxed max-w-xl">
+                Experience the power of real-time anomaly detection. Simulate payment flows 
+                and evaluate risk with our advanced machine learning engine.
+              </p>
+
+              {/* CTA */}
+              <div className="flex flex-col sm:flex-row gap-4 mt-8">
+                <Button asChild size="lg" className="w-full sm:w-auto gap-2 h-12 px-8 text-base font-semibold shadow-lg hover:shadow-xl transition-shadow">
+                  <Link to="/simulate">
+                    <PlayCircle className="h-5 w-5" aria-hidden="true" />
+                    Start Simulation
+                  </Link>
+                </Button>
+                <Button asChild variant="outline" size="lg" className="w-full sm:w-auto gap-2 h-12 px-8 text-base">
+                  <Link to="/admin">
+                    <Shield className="h-5 w-5" aria-hidden="true" />
+                    Admin Console
+                  </Link>
+                </Button>
+              </div>
             </div>
-            
-            {/* Headline */}
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-foreground mb-6">
-              Next-Gen Transaction
-              <span className="block text-primary">Fraud Detection</span>
-            </h1>
 
-            {/* Slogan */}
-            <p className="text-xl sm:text-2xl font-medium text-foreground/80 mb-4">
-              See the invisible. Block the impossible.
-            </p>
-            
-            {/* Subheadline */}
-            <p className="text-lg text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed">
-              Experience the power of real-time anomaly detection. Simulate payment flows 
-              and evaluate risk with our advanced machine learning engine.
-            </p>
-
-            {/* CTA */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button asChild size="lg" className="gap-2 h-12 px-8 text-base font-semibold shadow-lg hover:shadow-xl transition-shadow">
-                <Link to="/simulate">
-                  <PlayCircle className="h-5 w-5" aria-hidden="true" />
-                  Start Simulation
-                </Link>
-              </Button>
-              <Button asChild variant="outline" size="lg" className="gap-2 h-12 px-8 text-base">
-                <Link to="/admin">
-                  <Shield className="h-5 w-5" aria-hidden="true" />
-                  Admin Console
-                </Link>
-              </Button>
-            </div>
-
-            {/* Hero Visual - Abstract Shield */}
-            <div className="mt-16 flex justify-center">
+            {/* Hero Visual - Desktop Only */}
+            <div className="hidden md:flex md:flex-1 md:justify-center md:items-center">
               <div className="relative">
-                <div className="absolute inset-0 bg-primary/20 rounded-full blur-2xl animate-pulse-subtle" />
-                <div className="relative w-32 h-32 sm:w-40 sm:h-40 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 flex items-center justify-center">
-                  <Shield className="w-16 h-16 sm:w-20 sm:h-20 text-primary" aria-hidden="true" />
+                <div className="absolute inset-0 bg-primary/20 rounded-full blur-3xl animate-pulse-subtle" />
+                <div className="relative w-48 h-48 lg:w-64 lg:h-64 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 flex items-center justify-center">
+                  <Shield className="w-24 h-24 lg:w-32 lg:h-32 text-primary" aria-hidden="true" />
                 </div>
               </div>
             </div>
