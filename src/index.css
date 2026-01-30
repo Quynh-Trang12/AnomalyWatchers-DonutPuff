@@ -193,13 +193,13 @@
 
   /* Sticky bottom bar */
   .sticky-bottom-bar {
-    @apply fixed bottom-0 left-0 right-0 bg-card border-t border-border p-4 z-40;
+    @apply fixed bottom-0 left-0 right-0 bg-card border-t border-border p-2 sm:p-4 z-40;
     box-shadow: 0 -4px 12px -2px rgba(0, 0, 0, 0.06);
   }
 
   /* Form fieldsets */
   .form-fieldset {
-    @apply border border-border rounded-lg p-4 space-y-4;
+    @apply border border-border rounded-lg p-3 sm:p-4 space-y-3 sm:space-y-4;
   }
 
   .form-legend {

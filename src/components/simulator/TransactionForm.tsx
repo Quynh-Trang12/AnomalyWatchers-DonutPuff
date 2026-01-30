@@ -227,7 +227,7 @@ export function TransactionForm() {
   const isValid = type && nameOrig && amountNum > 0 && step >= 1;
 
   return (
-    <form ref={formRef} onSubmit={handleSubmit} className="space-y-6" noValidate>
+    <form ref={formRef} onSubmit={handleSubmit} className="space-y-4 sm:space-y-6" noValidate>
       {/* Error Summary */}
       {Object.keys(errors).length > 0 && (
         <div
@@ -246,14 +246,14 @@ export function TransactionForm() {
         </div>
       )}
 
-      <div className="grid lg:grid-cols-3 gap-6">
+      <div className="grid xl:grid-cols-3 gap-4 sm:gap-6">
         {/* Left Column - Form */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="xl:col-span-2 space-y-4 sm:space-y-6">
           {/* Time & Type */}
           <fieldset className="form-fieldset">
             <legend className="form-legend">Time & Event</legend>
             
-            <div className="grid sm:grid-cols-2 gap-4">
+            <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
               <div className="space-y-2">
                 <Label htmlFor="step">Time Step (Hour)</Label>
                 <Input
@@ -465,19 +465,20 @@ export function TransactionForm() {
         </div>
 
         {/* Right Column - Presets */}
-        <div className="lg:col-span-1">
+        <div className="xl:col-span-1">
           <PresetButtons onSelect={handlePresetSelect} disabled={isSubmitting} />
         </div>
       </div>
 
       {/* Sticky Bottom Bar */}
       <div className="sticky-bottom-bar">
-        <div className="container flex gap-3 justify-end">
+        <div className="container px-3 sm:px-4 flex flex-col-reverse sm:flex-row gap-2 sm:gap-3 justify-end">
           <Button
             type="button"
             variant="outline"
             onClick={handleReset}
             disabled={isSubmitting}
+            className="w-full sm:w-auto"
           >
             <RotateCcw className="h-4 w-4 mr-2" aria-hidden="true" />
             Reset
@@ -485,7 +486,7 @@ export function TransactionForm() {
           <Button
             type="submit"
             disabled={!isValid || isSubmitting}
-            className="min-w-[160px]"
+            className="w-full sm:w-auto sm:min-w-[160px]"
           >
             {isSubmitting ? (
               "Processing..."
