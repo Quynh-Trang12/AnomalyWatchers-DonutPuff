@@ -5,6 +5,7 @@ import { useState } from "react";
 
 const navLinks = [
   { to: "/", label: "Home" },
+  { to: "/dashboard", label: "Live Dashboard" },
   { to: "/simulate", label: "Simulator" },
   { to: "/history", label: "History" },
   { to: "/admin", label: "Admin" },
@@ -21,21 +22,23 @@ export function Header() {
         <span className="sr-only">Important notice: </span>
         ⚠️ Simulation only. No real transfers occur.
       </div>
-      
+
       <nav className="container flex items-center justify-between h-14 sm:h-16">
-        <Link 
-          to="/" 
+        <Link
+          to="/"
           className="flex items-center gap-2 text-primary font-semibold"
           aria-label="AnomalyWatchers - Home"
         >
           <Shield className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true" />
-          <span className="hidden sm:inline text-sm sm:text-base">AnomalyWatchers</span>
+          <span className="hidden sm:inline text-sm sm:text-base">
+            AnomalyWatchers
+          </span>
           <span className="sm:hidden text-sm">AW</span>
         </Link>
 
         {/* Desktop navigation */}
         <ul className="hidden md:flex items-center gap-1" role="list">
-          {navLinks.map(link => (
+          {navLinks.map((link) => (
             <li key={link.to}>
               <Link
                 to={link.to}
@@ -44,7 +47,9 @@ export function Header() {
                     ? "bg-accent text-accent-foreground"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted"
                 }`}
-                aria-current={location.pathname === link.to ? "page" : undefined}
+                aria-current={
+                  location.pathname === link.to ? "page" : undefined
+                }
               >
                 {link.label}
               </Link>
@@ -78,7 +83,7 @@ export function Header() {
           aria-label="Mobile navigation"
         >
           <ul className="container py-2 space-y-1" role="list">
-            {navLinks.map(link => (
+            {navLinks.map((link) => (
               <li key={link.to}>
                 <Link
                   to={link.to}
@@ -88,7 +93,9 @@ export function Header() {
                       : "text-muted-foreground hover:text-foreground hover:bg-muted"
                   }`}
                   onClick={() => setMobileMenuOpen(false)}
-                  aria-current={location.pathname === link.to ? "page" : undefined}
+                  aria-current={
+                    location.pathname === link.to ? "page" : undefined
+                  }
                 >
                   {link.label}
                 </Link>
