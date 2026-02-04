@@ -75,48 +75,36 @@ def predict_primary(data: TransactionInput):
     # Predict
     prob = models["primary"].predict_proba(features.values)[0][1]
     
-    # --- Hybrid Detection Logic ---
-    # The current ML model seems to be conservative or undertrained on specific edge cases.
-    # We apply heuristic boosting to ensure obvious fraud patterns are flagged.
+    print(f"ML Probability: {prob:.4f}")
     
-    heuristic_prob = 0.0
-    reasons = []
+    # --- Risk Assessment ---
+    # The XGBoost model is trained with AUPRC 0.9893, so we trust its predictions
+    # but add explainability for the frontend
     
-    # Rule 1: Zero-out / Balance Drain (High confidence fraud)
-    if data.amount > 0 and data.oldbalanceOrg > 0 and data.newbalanceOrig == 0:
-        if data.amount >= data.oldbalanceOrg:
-             heuristic_prob = max(heuristic_prob, 0.95)
-             reasons.append("Balance drain pattern detected")
-
-    # Rule 2: Excessive Amount (Liquidating huge sums)
-    if data.amount > 150000:
-        heuristic_prob = max(heuristic_prob, 0.70)
-        reasons.append("High value transaction")
-        
-    # Rule 3: Balance Error (Mathematical anomaly)
-    if abs(errorBalanceOrg) > 1000:
-        heuristic_prob = max(heuristic_prob, 0.85)
-        reasons.append("Balance sheet anomaly detected")
-
-    # Final Score: Combine ML and Rules
-    # If ML is low but Rules are high, trust Rules (Hybrid Ensemble)
-    final_prob = max(prob, heuristic_prob)
-    
-    is_fraud = final_prob > 0.5
+    is_fraud = prob > 0.5
     
     risk_level = "Low"
-    if final_prob > 0.8:
+    if prob > 0.8:
         risk_level = "High"
-    elif final_prob > 0.4:
-         risk_level = "Medium"
+    elif prob > 0.4:
+        risk_level = "Medium"
     
-    # Add explanations
-    explanation_text = "Transaction safe."
-    if is_fraud:
-        explanation_text = f"Flagged by AI Hybrid Engine. Risk Factors: {', '.join(reasons) if reasons else 'ML Model Detection'}."
+    # Generate explanation based on features
+    explanations = []
+    if prob > 0.5:
+        if errorBalanceOrg != 0:
+            explanations.append(f"Balance discrepancy: {errorBalanceOrg:.2f}")
+        if data.newbalanceOrig == 0 and data.amount >= data.oldbalanceOrg:
+            explanations.append("Account drain pattern detected")
+        if data.amount > 100000:
+            explanations.append("High value transaction")
+        if not explanations:
+            explanations.append("Suspicious transaction pattern detected by AI")
+    
+    explanation_text = "Transaction appears safe." if not is_fraud else f"Risk Factors: {', '.join(explanations)}"
 
     return {
-        "probability": float(final_prob),
+        "probability": float(prob),
         "is_fraud": bool(is_fraud),
         "risk_level": risk_level,
         "explanation": explanation_text
