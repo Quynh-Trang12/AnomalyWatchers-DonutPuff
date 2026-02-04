@@ -10,3 +10,4 @@ uvicorn
 pydantic
 python-multipart
 websockets
+imbalanced-learn

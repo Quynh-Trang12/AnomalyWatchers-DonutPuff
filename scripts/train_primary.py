@@ -61,17 +61,19 @@ def train():
     print("\n[Step 4] Hyperparameter Tuning (RandomizedSearchCV)...")
     xgb_model = xgb.XGBClassifier(eval_metric='logloss', use_label_encoder=False)
     
-    params = {
+    # User-defined HD Grid
+    param_dist = {
         'n_estimators': [100, 200, 300],
-        'learning_rate': [0.01, 0.1, 0.2],
-        'max_depth': [3, 5, 7],
-        'scale_pos_weight': [1, 10] # Even with SMOTE, slight weighting can help
+        'learning_rate': [0.01, 0.05, 0.1, 0.2],
+        'max_depth': [3, 4, 5, 6],
+        'colsample_bytree': [0.6, 0.8, 1.0],
+        'scale_pos_weight': [1, 10, 25, 50]  # Crucial for imbalance!
     }
     
     random_search = RandomizedSearchCV(
         xgb_model, 
-        param_distributions=params, 
-        n_iter=5, 
+        param_distributions=param_dist, 
+        n_iter=10, 
         cv=3, 
         verbose=1,
         scoring='average_precision', # Optimize for AUPRC directly
